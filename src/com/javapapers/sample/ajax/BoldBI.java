@@ -30,7 +30,7 @@ public class BoldBI extends HttpServlet {
 	 * A simple HelloWorld Servlet
 	 */
 	public static String UserEmail = "admin@domain.com";
-	public static String EmbedSecret = "MvAiyOHPyppihvV22RpQDkMy8bQC10hL";
+	public static String EmbedSecret = "enter your embed secret";
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws java.io.IOException {
