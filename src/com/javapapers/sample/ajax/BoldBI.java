@@ -8,30 +8,21 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.security.InvalidKeyException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.time.Instant;
-
+import java.util.Base64;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 public class BoldBI extends HttpServlet {
 
-	/**
-	 * A simple HelloWorld Servlet
-	 */
-	public static String UserEmail = "admin@domain.com";
-	public static String EmbedSecret = "enter your embed secret";
-	
 	public void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws java.io.IOException {
 		StringBuffer jb = new StringBuffer();
@@ -54,10 +45,9 @@ public class BoldBI extends HttpServlet {
 		  
 		var embedQuery = String.valueOf(json.get("embedQuerString"));
 		var serverAPIUrl = String.valueOf(json.get("dashboardServerApiUrl"));
-		StringBuilder embedQueryBuilder = new 
-                StringBuilder(embedQuery);
+		StringBuilder embedQueryBuilder = new StringBuilder(embedQuery);
         // User your user-email as embed_user_email
-		embedQueryBuilder.append("&embed_user_email=" + UserEmail);
+		embedQueryBuilder.append("&embed_user_email=" + GlobalAppSettings.EmbedDetails.UserEmail);
         long serverTimestamp = Instant.now().getEpochSecond();
         embedQueryBuilder.append("&embed_server_timestamp=" + serverTimestamp);
         var embedDetailsUrl = new StringBuilder("/embed/authorize?");
@@ -83,7 +73,7 @@ public class BoldBI extends HttpServlet {
 	}
 	
 	public static String GetSignatureUrl (String queryString) throws InvalidKeyException {
-		String secretAccessKey = EmbedSecret;
+		String secretAccessKey = GlobalAppSettings.EmbedDetails.EmbedSecret;
 	   	byte[] secretKey = secretAccessKey.getBytes();
 	   	SecretKeySpec signingKey = new SecretKeySpec(secretKey, "HmacSHA256");
 	   	Mac mac = null;
@@ -95,13 +85,10 @@ public class BoldBI extends HttpServlet {
 		mac.init(signingKey);
 		byte[] bytes = queryString.getBytes();
 		byte[] rawHmac = mac.doFinal(bytes);
-		//System.out.println(Base64.encodeBytes(rawHmac));
 		return new String(Base64.getEncoder().encode(rawHmac));
 	}
-	
-	public void doGet(HttpServletRequest req, HttpServletResponse res)
-			throws java.io.IOException {
+
+	public void doGet(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException {
 		doPost(req, res);
-	}	
-	
+	}
 }
